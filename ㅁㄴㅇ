@@ -1,0 +1,210 @@
+#include<stdio.h>
+#include<windows.h>
+#include<conio.h>
+#include<time.h>
+#define DINO_BOTTOM_Y 12
+#define TREE_BOTTOM_Y 20
+#define TREE_BOTTOM_X 45
+
+//시작 설계 6/1일자  1.공룡 설정 2.공룡 움직임 설정  완료  //게임의 좌표 설정(완료)//나무 구성 (완료)//게임을 위한 나무와 공룡 움직임 설정//충돌 구성 설정//게임 스코어 설정  
+//콘솔 창의 크기와 제목을 지정하는 함수
+void SetConsoleView()
+{
+	system("mode con:cols=100 lines=25");
+	system("title Google Dinosaurs.By BlockDMask");
+}
+
+//커서의 위치를 x, y로 이동하는 함수
+void GotoXY(int x, int y) //Gotoxy는 <windows.h>에들어간함수로 좌표를설정하는 함수  //좌표  x는 달리는 지면 y는 이치 달릴수록 x감소 점프하면 y감소  
+{
+	COORD Pos;
+	Pos.X = 2 * x;
+	Pos.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);//콘솔의 커서  위치를 알려주는게 맨바깥 안쪽G가  화면출력 핸들러 STD가 G를 데리고 오는 깃발
+	//pos는 매개변수의 위치를 알려줌 
+}
+
+//키보드의 입력을 받고, 입력된 키의 값을 반환하는 함수
+int GetKeyDown()
+{
+	if (_kbhit() != 0)
+	{
+		return _getch();
+	}
+	return 0;
+}
+
+void DrawDino(int dinoY)
+{
+	GotoXY(0, dinoY);
+	static bool legFlag = true;
+	printf("        $$$$$$$ \n");
+	printf("       $$ $$$$$$\n");
+	printf("       $$$$$$$$$\n");
+	printf("$      $$$      \n");
+	printf("$$     $$$$$$$  \n");
+	printf("$$$   $$$$$     \n");
+	printf(" $$  $$$$$$$$$$ \n");
+	printf(" $$$$$$$$$$$    \n");
+	printf("  $$$$$$$$$$    \n");
+	printf("    $$$$$$$$    \n");
+	printf("     $$$$$$     \n");
+	if (legFlag)
+	{
+		printf("     $    $$$    \n");
+		printf("     $$          ");
+		legFlag = false;
+	}
+	else
+	{
+		printf("     $$$  $     \n");
+		printf("          $$    ");
+		legFlag = true;
+	}
+}
+void DrawTree(int treeX)
+{
+	GotoXY(treeX, TREE_BOTTOM_Y);
+	printf("$$$$");
+	GotoXY(treeX, TREE_BOTTOM_Y + 1);
+	printf(" $$ ");
+	GotoXY(treeX, TREE_BOTTOM_Y + 2);
+	printf(" $$ ");
+	GotoXY(treeX, TREE_BOTTOM_Y + 3);
+	printf(" $$ ");
+	GotoXY(treeX, TREE_BOTTOM_Y + 4);
+	printf(" $$ ");
+}
+
+void DrawTreetwo(int treeXx)
+{
+	GotoXY(treeXx, TREE_BOTTOM_Y);
+	
+	GotoXY(treeXx, TREE_BOTTOM_Y -15);
+	printf(" $$ ");
+	GotoXY(treeXx, TREE_BOTTOM_Y -14);
+	printf(" $$ ");
+	GotoXY(treeXx, TREE_BOTTOM_Y -13);
+	printf(" $$ ");
+	GotoXY(treeXx, TREE_BOTTOM_Y -12);
+	printf(" $$ ");
+}
+
+void DrawGameOver(const int score)
+{
+	system("cls");
+	int x = 18;
+	int y = 8;
+	GotoXY(x, y);
+	printf("===========================");
+	GotoXY(x, y + 1);
+	printf("======G A M E O V E R======");
+	GotoXY(x, y + 2);	
+	printf("===========================");
+	GotoXY(x, y + 5);
+	printf("SCORE : %d", score);
+
+	printf("\n\n\n\n\n\n\n\n\n");
+	system("pause");
+}
+bool isCollision(const int treeX, const int dinoY,const int treeXx)
+{
+	//트리의 X가 공룡의 몸체쪽에 있을때,
+	//공룡의 높이가 충분하지 않다면 충돌로 처리
+	GotoXY(0, 0); //구성하는 xy위치 조정  
+	printf("treeX : %d, dinoY : %d, treeXx:%d",treeX,dinoY,treeXx); //이런식으로 적절한 X, Y를 찾습니다.
+	if (treeX <= 8 && treeX >= 4&&dinoY>8&&treeXx>=7)// 충돌이 되었다 판단을 구성한 함수   
+	{
+		return true;//게임 종료  
+	}
+	return false;
+}
+
+int main(void)
+{
+	SetConsoleView();
+	while(true)
+	{
+	bool isJumping = false;// bool isCollision의 함수를 불러오는선언 
+	bool isBottom = true; //게임에 대한 루프형성 불함수  
+	const int gravity = 3;
+	int dinoY = DINO_BOTTOM_Y;
+	int treeX = TREE_BOTTOM_X;
+	int treeXx=TREE_BOTTOM_Y;
+	
+	int score = 0;
+	clock_t start, curr;	//점수 변수 초기화
+	start = clock();		//시작시간 초기화
+	while (true)		
+	{
+		//(v2.0) 충돌체크 트리의 x값과 공룡의 y값으로 판단
+		if(isCollision(treeX,dinoY,treeXx))
+			break;
+
+		//x 키가 눌렸고, 바닥이 아닐때 점프
+			if (GetKeyDown() == 'x' && isBottom)
+			{
+			isJumping = true;
+			isBottom = false;
+			}
+		
+			//점프중이라면 Y를 감소, 점프가 끝났으면 Y를 증가.
+			if (isJumping)
+			{
+				dinoY -= gravity;
+			}
+			else
+			{
+				dinoY += gravity;
+			}
+
+			//Y가 계속해서 증가하는걸 막기위해 바닥을 지정.
+			if (dinoY >= DINO_BOTTOM_Y)
+			{
+				dinoY = DINO_BOTTOM_Y;
+				isBottom = true;
+			}
+
+			//나무가 왼쪽으로 (x음수) 가도록하고
+			//나무의 위치가 왼쪽 끝으로가면 다시 오른쪽 끝으로 소환.
+			treeX -= 2;
+			if (treeX <= 0)
+			{
+				treeX = TREE_BOTTOM_X;
+			}
+			treeXx -=1;
+			if (treeXx <= 0)
+			{
+				treeXx = TREE_BOTTOM_X;
+			}
+			//점프의 맨위를 찍으면 점프가 끝난 상황.
+			if (dinoY <= 3) //맨위를 찍엇을때 좌표 상황  
+			{
+				isJumping = false;
+			}
+			
+			DrawTree(treeX);
+			DrawDino(dinoY);
+			DrawTreetwo(treeXx);
+		   
+			
+			curr = clock();	//현재시간 받아오기 clock(): time.h에 들어있는 함수로 프로그램에 의해 프로세서가 소비된 시간을 반환하는 함수 프로세서가 측정한 프로그램 실행시간.
+			//clock_t: clock ticks의 자료를 담고 있는 자료형 clock()의 반환형입니다.
+			//CLOCKS_PER_SEC: 초당 clock ticks의 수를 나타낸 매크로로 시스템에 따라 기본 값이 다르며 시간을 표시하기 위해 아래 예제처럼 사용합니다.
+			if (((curr - start) / CLOCKS_PER_SEC) >= 1)	// 1초가 넘었을??
+			{
+				score++;	//스코어 UP
+				start = clock();	//시작시간 초기화
+			}
+		
+		Sleep(50); //#include<windows.h>에 속해있는 함수로 속도를 지연도를 정하는  함수  
+		system("cls");
+		
+			//(v2.0) 점수출력을 1초마다 해주는것이 아니라 항상 출력해주면서, 1초가 지났을때 ++ 해줍니다.
+			GotoXY(22, 0);	//커서를 가운데 위쪽으로 옮긴다. 콘솔창이 cols=100이니까 2*x이므로 22정도 넣어줌
+			printf("Score : %d ", score);	//점수 출력해줌
+	}
+		DrawGameOver(score);
+	}
+	return 0;
+}
