@@ -113,10 +113,12 @@ bool isCollision(const int treeX, const int dinoY,const int treeXx)
 	//공룡의 높이가 충분하지 않다면 충돌로 처리
 	GotoXY(0, 0); //구성하는 xy위치 조정  
 	printf("treeX : %d, dinoY : %d, treeXx:%d",treeX,dinoY,treeXx); //이런식으로 적절한 X, Y를 찾습니다.
-	if (treeX <= 8 && treeX >= 4&&dinoY>8&&treeXx>=7)// 충돌이 되었다 판단을 구성한 함수   
-	{
-		return true;//게임 종료  
-	}
+	if (treeX <= 8 && treeX >= 4 && dinoY>8)// 충돌이 되었다 판단을 구성한 함수   
+   {
+        return true;//게임 종료  
+   }else if((treeXx <= 8 && treeXx >= 4 && dinoY<7)){
+        return true;//게임 종료  
+    }
 	return false;
 }
 
@@ -199,7 +201,7 @@ int main(void)
 		
 		Sleep(50); //#include<windows.h>에 속해있는 함수로 속도를 지연도를 정하는  함수  
 		system("cls");
-		
+		//
 			//(v2.0) 점수출력을 1초마다 해주는것이 아니라 항상 출력해주면서, 1초가 지났을때 ++ 해줍니다.
 			GotoXY(22, 0);	//커서를 가운데 위쪽으로 옮긴다. 콘솔창이 cols=100이니까 2*x이므로 22정도 넣어줌
 			printf("Score : %d ", score);	//점수 출력해줌
@@ -207,4 +209,4 @@ int main(void)
 		DrawGameOver(score);
 	}
 	return 0;
-}
+}//BlockDMask님의 공룡 파일 따라해보기 실습
