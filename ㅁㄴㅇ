@@ -11,7 +11,7 @@
 void SetConsoleView()
 {
 	system("mode con:cols=100 lines=25");
-	system("title Google Dinosaurs.By BlockDMask");
+	system("title Google Dinosaurs.BlockDMask");
 }
 
 //커서의 위치를 x, y로 이동하는 함수
@@ -79,7 +79,6 @@ void DrawTree(int treeX)
 void DrawTreetwo(int treeXx)
 {
 	GotoXY(treeXx, TREE_BOTTOM_Y);
-	
 	GotoXY(treeXx, TREE_BOTTOM_Y -15);
 	printf(" $$ ");
 	GotoXY(treeXx, TREE_BOTTOM_Y -14);
@@ -107,16 +106,27 @@ void DrawGameOver(const int score)
 	printf("\n\n\n\n\n\n\n\n\n");
 	system("pause");
 }
+void DrawLevel(const int Level)//레벨출력  
+{
+	system("cls");
+	int x = 18;
+	int y = 20;
+	GotoXY(x, y + 7);
+	printf("SCORE : %d", Level);
+}
 bool isCollision(const int treeX, const int dinoY,const int treeXx)
 {
 	//트리의 X가 공룡의 몸체쪽에 있을때,
 	//공룡의 높이가 충분하지 않다면 충돌로 처리
 	GotoXY(0, 0); //구성하는 xy위치 조정  
 	printf("treeX : %d, dinoY : %d, treeXx:%d",treeX,dinoY,treeXx); //이런식으로 적절한 X, Y를 찾습니다.
+	
 	if (treeX <= 8 && treeX >= 4 && dinoY>8)// 충돌이 되었다 판단을 구성한 함수   
    {
         return true;//게임 종료  
-   }else if((treeXx <= 8 && treeXx >= 4 && dinoY<7)){
+   }
+   else if((treeXx <= 8 && treeXx >= 4 && dinoY<7))
+   {
         return true;//게임 종료  
     }
 	return false;
@@ -135,6 +145,7 @@ int main(void)
 	int treeXx=TREE_BOTTOM_Y;
 	
 	int score = 0;
+	int Level=0;
 	clock_t start, curr;	//점수 변수 초기화
 	start = clock();		//시작시간 초기화
 	while (true)		
@@ -184,12 +195,9 @@ int main(void)
 			{
 				isJumping = false;
 			}
-			
 			DrawTree(treeX);
 			DrawDino(dinoY);
 			DrawTreetwo(treeXx);
-		   
-			
 			curr = clock();	//현재시간 받아오기 clock(): time.h에 들어있는 함수로 프로그램에 의해 프로세서가 소비된 시간을 반환하는 함수 프로세서가 측정한 프로그램 실행시간.
 			//clock_t: clock ticks의 자료를 담고 있는 자료형 clock()의 반환형입니다.
 			//CLOCKS_PER_SEC: 초당 clock ticks의 수를 나타낸 매크로로 시스템에 따라 기본 값이 다르며 시간을 표시하기 위해 아래 예제처럼 사용합니다.
@@ -198,13 +206,27 @@ int main(void)
 				score++;	//스코어 UP
 				start = clock();	//시작시간 초기화
 			}
-		
-		Sleep(50); //#include<windows.h>에 속해있는 함수로 속도를 지연도를 정하는  함수  
+			//속도 구간 
+			if (score >= 5&&score <= 10)
+			{
+					Sleep(30);
+					Level=1;
+			}
+			else if (score >= 11)
+			{
+					Sleep(20);
+					Level=2;
+			}
+			else
+			{
+				Sleep(70);
+			}
+		//Sleep(50); //#include<windows.h>에 속해있는 함수로 속도를 지연도를 정하는  함수 
 		system("cls");
-		//
 			//(v2.0) 점수출력을 1초마다 해주는것이 아니라 항상 출력해주면서, 1초가 지났을때 ++ 해줍니다.
 			GotoXY(22, 0);	//커서를 가운데 위쪽으로 옮긴다. 콘솔창이 cols=100이니까 2*x이므로 22정도 넣어줌
-			printf("Score : %d ", score);	//점수 출력해줌
+			printf("Score : %d ", score);//점수 출력해줌
+			printf("Level : %d", Level);//레벨  출력해줌	
 	}
 		DrawGameOver(score);
 	}
